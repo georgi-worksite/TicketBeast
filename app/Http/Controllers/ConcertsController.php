@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Concert;
 use Illuminate\Http\Request;
 
-class ConcertController extends Controller
+class ConcertsController extends Controller
 {
-    /**
+     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -46,7 +46,9 @@ class ConcertController extends Controller
      */
     public function show(Concert $concert)
     {
-        //
+        return 1;
+        dd("Reached");
+        return view('concerts.show');
     }
 
     /**
