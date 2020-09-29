@@ -23,26 +23,30 @@ class ViewConcertListingTest extends TestCase
             'subtitle' => 'with Animosity and lethargy',
             'date' => Carbon::parse('December 13, 2020 8:00pm'),
             'ticket_price' => 3250,
-            'venu' => 'THe Mosh Pit',
+            'venu' => 'The Mosh Pit',
             'venu_address' => '123 Example Lane',
             'city' => 'Burlington',
             'state' => 'ON',
             'zip' => 'L89R7T',
-            'additional' => 'For tickets, call (555) 555-5555.'
+            'additional' => 'For tickets, call (555) 555-5555.',
         ]);
 
-        $view = $this->view('/concerts/'.$concert->id);
+        $response = $this->get('/concerts/'.$concert->id);
 
-        $view->assertSeeText('The Red Cord');
-        $view->assertSeeText('with Animosity and lethargy');
-        $view->assertSeeText('December 13, 2020');
-        $view->assertSeeText('8:00pm');
-        $view->assertSeeText(3250);
-        $view->assertSeeText('THe Mosh Pit');
-        $view->assertSeeText('123 Example Lane');
-        $view->assertSeeText('Burlington');
-        $view->assertSeeText('ON');
-        $view->assertSeeText('L89R7T');
-        $view->assertSeeText('For tickets, call (555) 555-5555.');
+        $response->assertStatus(200);
+
+        $response->dump();
+
+        $response->assertSeeText('The Red Cord');
+        $response->assertSeeText('with Animosity and lethargy');
+        $response->assertSeeText('December 13, 2020');
+        $response->assertSeeText('8:00pm');
+        $response->assertSeeText('32.50');
+        $response->assertSeeText('The Mosh Pit');
+        $response->assertSeeText('123 Example Lane');
+        $response->assertSeeText('Burlington');
+        $response->assertSeeText('ON');
+        $response->assertSeeText('L89R7T');
+        $response->assertSeeText('For tickets, call (555) 555-5555.');
     }
 }
