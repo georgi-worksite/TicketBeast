@@ -10,7 +10,12 @@ class Concert extends Model
     use HasFactory;
 
     protected $guarded = [];
-    protected $dates = ['date'];
+    protected $dates = ['date', 'published_at'];
+
+    public function scopePublished($query)
+    {
+        return $query->whereNotNull('published_at');
+    }
 
     /**
      * Returns formatted date.

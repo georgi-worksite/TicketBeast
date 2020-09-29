@@ -41,6 +41,10 @@ class ConcertsController extends Controller
      */
     public function show(Concert $concert)
     {
+        if (!$concert->published_at) {
+            abort(404);
+        }
+
         return view('concerts.show', ['concert' => $concert]);
     }
 

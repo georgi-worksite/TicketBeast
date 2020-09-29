@@ -16,9 +16,9 @@ class ViewConcertListingTest extends TestCase
     /**
      * @test
      */
-    public function user_can_view_concert_listing()
+    public function user_can_view_a_published_concert_listing()
     {
-        $concert = Concert::create([
+        $concert = Concert::factory()->published()->create([
             'title' => 'The Red Cord',
             'subtitle' => 'with Animosity and lethargy',
             'date' => Carbon::parse('December 13, 2020 8:00pm'),
@@ -33,9 +33,7 @@ class ViewConcertListingTest extends TestCase
 
         $response = $this->get('/concerts/'.$concert->id);
 
-        $response->assertStatus(200);
-
-        $response->dump();
+        $response->assertOk();
 
         $response->assertSeeText('The Red Cord');
         $response->assertSeeText('with Animosity and lethargy');
@@ -48,5 +46,16 @@ class ViewConcertListingTest extends TestCase
         $response->assertSeeText('ON');
         $response->assertSeeText('L89R7T');
         $response->assertSeeText('For tickets, call (555) 555-5555.');
+    }
+
+    /**
+     * @test
+     */
+    public function user_cannot_view_unpublished_concert_listings()
+    {
+        $concert = Concert::factory()->unpublished()->create();
+
+        $response = $this->get('/concerts/'.$concert->id);
+        $response->assertNotFound();
     }
 }

@@ -35,4 +35,32 @@ class ConcertFactory extends Factory
             'additional' => 'Some sample additional information',
         ];
     }
+
+    /**
+     * Indicate that the concert is published.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function published()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+            'published_at' => Carbon::parse('-1 week'),
+            ];
+        });
+    }
+
+    /**
+     * Indicate that the concert is published.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function unpublished()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+            'published_at' => null,
+            ];
+        });
+    }
 }
