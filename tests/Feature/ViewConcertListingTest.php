@@ -11,7 +11,6 @@ use Tests\TestCase;
 class ViewConcertListingTest extends TestCase
 {
     use DatabaseMigrations;
-    use RefreshDatabase;
 
     /**
      * @test
