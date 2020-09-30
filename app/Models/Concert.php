@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Concert extends Model
 {
@@ -45,5 +46,25 @@ class Concert extends Model
     public function getFormattedTicketPriceAttribute()
     {
         return number_format($this->ticket_price / 100, 2);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function orderTickets($email, $ticketQuantity)
+    {
+        $order = $this->orders()->create(['email' => $email]);
+
+        // Creating tickets
+        foreach (range(1, $ticketQuantity) as $index) {
+            $order->tickets()->create([]);
+        }
+
+        return $order;
     }
 }
