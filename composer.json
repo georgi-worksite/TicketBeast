@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.0"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^2.8",
         "facade/ignition": "^2.3.6",
         "friendsofphp/php-cs-fixer": "^2.16",
         "fzaninotto/faker": "^1.9.1",
@@ -48,6 +49,10 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
+        "idehelper": [
+            "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:model"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
