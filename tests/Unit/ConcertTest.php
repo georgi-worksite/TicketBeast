@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Exceptions\NotEnoughTicketsException;
 use App\Models\Concert;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Carbon;
@@ -74,16 +75,89 @@ class ConcertTest extends TestCase
     /**
      * @test
      */
+    public function can_add_tickets()
+    {
+        $this->withExceptionHandling();
+
+        $concert = Concert::factory()->create([]);
+        $concert->addTickets(10);
+
+        $this->assertEquals(10, $concert->ticketsRemaining());
+    }
+
+    /**
+     * @test
+     */
     public function can_order_concert_tickets()
     {
         $this->withExceptionHandling();
 
         $concert = Concert::factory()->create([]);
+        $concert->addTickets(10);
 
         $order = $concert->orderTickets('jane@example.com', 3);
 
         $this->assertNotNull($order);
         $this->assertEquals('jane@example.com', $order->email);
         $this->assertEquals(3, $order->tickets()->count());
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_order_more_concert_tickets_than_available()
+    {
+        $this->withExceptionHandling();
+
+        $concert = Concert::factory()->create([]);
+        $concert->addTickets(10);
+
+        try {
+            $order = $concert->orderTickets('jane@example.com', 12);
+        } catch (NotEnoughTicketsException $e) {
+            $order = $concert->orders()->where('email','jane@example.com')->first();
+            $this->assertNull($order);
+            $this->assertEquals(10, $concert->ticketsRemaining());
+            return;
+        }
+        $this->fail('Order succedded even though not enough tickets available!');
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_order_tickets_thats_alreday_purchased()
+    {
+        $this->withExceptionHandling();
+
+        $concert = Concert::factory()->create([]);
+        $concert->addTickets(10);
+        $concert->orderTickets('john@example.com', 5);
+
+        $this->assertEquals(5,$concert->ticketsRemaining());
+
+        try {
+            $concert->orderTickets('jane@example.com', 6);
+        } catch (NotEnoughTicketsException $e) {
+            $order = $concert->orders()->where('email', 'jane@example.com')->first();
+            $this->assertNull($order);
+            $this->assertEquals(5, $concert->ticketsRemaining());
+            return ;
+        }
+        $this->fail('Order succedded even though not enough tickets available!');
+    }
+
+    /**
+     * @test
+     */
+    public function tickets_remaining_does_not_inlcude_tickets_associated_with_an_order()
+    {
+        $this->withExceptionHandling();
+
+        $concert = Concert::factory()->create([]);
+        $concert->addTickets(10);
+        $concert->orderTickets('jane@example.com', 3);
+
+        $this->assertEquals(7, $concert->ticketsRemaining());
     }
 }
