@@ -8,9 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 class Ticket extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 
     public function scopeAvailable($query)
     {
         return $query->whereNull('order_id');
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function concert()
+    {
+        return $this->belongsTo(Concert::class);
+    }
+
+    public function release()
+    {
+        $this->order()->dissociate()->save();
     }
 }
