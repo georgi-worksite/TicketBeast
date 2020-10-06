@@ -29,4 +29,9 @@ class Ticket extends Model
     {
         $this->order()->dissociate()->save();
     }
+
+    public function getPriceAttribute()
+    {
+        return $this->concert->ticket_price;
+    }
 }

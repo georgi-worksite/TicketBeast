@@ -6,6 +6,7 @@ use App\Exceptions\NotEnoughTicketsException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Concert extends Model
 {
@@ -54,7 +55,8 @@ class Concert extends Model
      */
     public function orders()
     {
-        return $this->hasMany(Order::class);
+        //return $this->hasMany(Order::class);
+        return $this->belongsToMany(Order::class, 'tickets');
     }
 
     /**
@@ -83,28 +85,37 @@ class Concert extends Model
     /**
      * @return Order
      */
-    public function orderTickets($email, $ticketQuantity)
+    public function orderTickets(string $email,int $ticketQuantity)
     {
-        $tickets = $this->tickets()->available()->take($ticketQuantity)->get();
-        if ($tickets->count() < $ticketQuantity) {
+        $tickets = $this->findTickets($ticketQuantity);
+
+        return $this->createOrder($email, $tickets);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function findTickets(int $quantity)
+    {
+        $tickets = $this->tickets()->available()->take($quantity)->get();
+        if ($tickets->count() < $quantity) {
             throw new NotEnoughTicketsException();
         }
 
-        $order = $this->orders()->create(['email' => $email]);
-
-        foreach ($tickets as $ticket) {
-            $order->tickets()->save($ticket);
-        }
-
-        return $order;
+        return $tickets;
     }
 
-    public function hasOrderFor($userEmail)
+    public function createOrder(string $email,Collection $tickets)
+    {
+        return Order::forTickets($tickets,$email,$tickets->sum('price'));
+    }
+
+    public function hasOrderFor(string $userEmail)
     {
         return $this->orders()->where('email', $userEmail)->count() > 0;
     }
 
-    public function ordersFor($userEmail)
+    public function ordersFor(string $userEmail)
     {
         return $this->orders()->where('email', $userEmail)->get();
     }

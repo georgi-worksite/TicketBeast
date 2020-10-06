@@ -16,8 +16,7 @@ class TicketTest extends TestCase
     */
     public function ticket_can_be_released()
     {
-        $concert = Concert::factory()->published()->create(['ticket_price'=>3250]);
-        $concert->addTickets(1);
+        $concert = Concert::factory()->published()->create(['ticket_price'=>3250])->addTickets(1);
         $this->assertEquals(1,$concert->ticketsRemaining());
 
         $order = $concert->orderTickets('jane@example.com', 1);

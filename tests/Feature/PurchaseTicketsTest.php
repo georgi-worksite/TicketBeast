@@ -42,7 +42,6 @@ class PurchaseTicketsTest extends TestCase
     public function customer_can_purchase_published_concert_tickets()
     {
         $this->withoutExceptionHandling();
-
         $concert = Concert::factory()->published()->create(['ticket_price' => 3250])->addTickets(10);
 
         $response = $this->orderTickets($concert->id, [
@@ -52,10 +51,16 @@ class PurchaseTicketsTest extends TestCase
         ]);
 
         $response->assertCreated();
+        $response->assertJson([
+            'email' => 'john@example.com',
+            'ticket_quantity' => 3,
+            'amount' => 9750,
+        ]);
+
         $this->assertEquals(9750, $this->paymentGateway->totalCharges());
 
         $this->assertTrue($concert->hasOrderFor('john@example.com'));
-        $this->assertEquals(3, $concert->ordersFor('john@example.com')->first()->tickets()->count());
+        $this->assertEquals(3, $concert->ordersFor('john@example.com')->first()->ticketQuantity());
     }
 
     /**
@@ -167,7 +172,7 @@ class PurchaseTicketsTest extends TestCase
         ]);
 
         $response->assertNotFound();
-        $this->assertEquals(0, $concert->orders()->count());
+        $this->assertFalse($concert->hasOrderFor('jane@example.com'));
         $this->assertEquals(0, $this->paymentGateway->totalCharges());
     }
 
@@ -176,7 +181,6 @@ class PurchaseTicketsTest extends TestCase
      */
     public function cannot_purchase_more_tickets_than_remain_for_published_concerts()
     {
-        $this->withoutExceptionHandling();
         $concert = Concert::factory()->published()->create(['ticket_price' => 3250]);
         $concert->addTickets(5);
 
@@ -187,8 +191,7 @@ class PurchaseTicketsTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $order = $concert->orders()->find(['email' => 'jane@example.com'])->first();
-        $this->assertNull($order);
+        $this->assertFalse($concert->hasOrderFor('jane@example.com'));
         $this->assertEquals(0, $this->paymentGateway->totalCharges());
         $this->assertEquals(5, $concert->ticketsRemaining());
     }
