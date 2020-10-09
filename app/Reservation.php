@@ -9,14 +9,21 @@ class Reservation
     protected Collection $tickets;
     protected int $amount;
 
-    public function __construct(Collection $tickets)
+    function __construct(Collection $tickets)
     {
-        $this->$tickets = $tickets;
+        $this->tickets = $tickets;
         $this->amount = $tickets->sum('price');
     }
 
     public function totalCost()
     {
         return $this->amount;
+    }
+
+    public function cancel()
+    {
+        foreach ($this->tickets as $ticket ) {
+            $ticket->release();
+        }
     }
 }

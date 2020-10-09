@@ -4,15 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Ticket extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    protected $dates = ['craeted_at'];
 
     public function scopeAvailable($query)
     {
-        return $query->whereNull('order_id');
+        return $query->whereNull('order_id')->whereNull('reserved_at');
     }
 
     public function order()
@@ -28,6 +30,11 @@ class Ticket extends Model
     public function release()
     {
         $this->order()->dissociate()->save();
+    }
+
+    public function reserve()
+    {
+        $this->update(['reserved_at' => Carbon::now()]);
     }
 
     public function getPriceAttribute()
