@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Reservation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;

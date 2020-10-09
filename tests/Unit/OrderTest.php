@@ -4,6 +4,8 @@ namespace Tests\Unit;
 
 use App\Models\Concert;
 use App\Models\Order;
+use App\Models\Ticket;
+use App\Reservation;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -19,13 +21,14 @@ class OrderTest extends TestCase
         $concert = Concert::factory()->published()->create()->addTickets(5);
         $tickets = $concert->findTickets(2);
 
-        $order = Order::forTickets($tickets, 'jane@example.com',2400);
+        $order = Order::forTickets($tickets, 'jane@example.com', 2400);
 
         $this->assertNotNull($order);
         $this->assertNotNull($concert->hasOrderFor('jane@example.com'));
         $this->assertEquals(2, $order->ticketQuantity());
         $this->assertEquals(2400, $order->amount);
     }
+
 
     /**
      * @test

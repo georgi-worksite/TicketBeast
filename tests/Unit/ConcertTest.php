@@ -154,9 +154,10 @@ class ConcertTest extends TestCase
         $concert = Concert::factory()->published()->create([])->addTickets(3);
         $this->assertEquals(3, $concert->ticketsRemaining());
 
-        $reservedTickets = $concert->reserveTickets(2);
+        $reservation = $concert->reserveTickets(2, 'jane@example.com');
 
-        $this->assertNotNull($reservedTickets);
+        $this->assertNotNull($reservation);
+        $this->assertCount(2, $reservation->tickets());
         $this->assertEquals(1, $concert->ticketsRemaining());
     }
 
@@ -172,12 +173,13 @@ class ConcertTest extends TestCase
         $this->assertEquals(1, $concert->ticketsRemaining());
 
         try {
-            $reservedTickets = $concert->reserveTickets(2);
+            $reservedTickets = $concert->reserveTickets(2, 'jane@example.com');
         } catch (NotEnoughTicketsException $e) {
             $this->assertEquals(1, $concert->ticketsRemaining());
+
             return;
         }
-        $this->fail("Reserving ticket succeeded even though the tickets were sold.");
+        $this->fail('Reserving ticket succeeded even though the tickets were sold.');
     }
 
     /**
@@ -188,15 +190,16 @@ class ConcertTest extends TestCase
         /** @var Concert */
         $concert = Concert::factory()->published()->create([])->addTickets(3);
         $this->assertEquals(3, $concert->ticketsRemaining());
-        $concert->reserveTickets(2);
+        $concert->reserveTickets(2, 'jane@example.com');
         $this->assertEquals(1, $concert->ticketsRemaining());
 
         try {
-            $reservedTickets = $concert->reserveTickets(2);
+            $reservedTickets = $concert->reserveTickets(2,'jane@example.com');
         } catch (NotEnoughTicketsException $e) {
             $this->assertEquals(1, $concert->ticketsRemaining());
+
             return;
         }
-        $this->fail("Reserving ticket succeeded even though the tickets were alreday reserved by someone else.");
+        $this->fail('Reserving ticket succeeded even though the tickets were alreday reserved by someone else.');
     }
 }
