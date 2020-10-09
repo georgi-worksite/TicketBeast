@@ -67,7 +67,7 @@ class PurchaseTicketsTest extends TestCase
      */
     public function email_is_required_to_purchase_published_concert_tickets()
     {
-        $concert = Concert::factory()->published()->create(['ticket_price' => 3250]);
+        $concert = Concert::factory()->published()->create(['ticket_price' => 3250])->addTickets(5);
 
         $response = $this->orderTickets($concert->id, [
             'ticket_quantity' => 3,
@@ -75,7 +75,7 @@ class PurchaseTicketsTest extends TestCase
         ]);
 
         $response->assertJsonValidationErrors('email');
-        $this->assertEquals(2, $concert->ticketsRemaining());
+        $this->assertEquals(5, $concert->ticketsRemaining());
     }
 
     /**
@@ -161,7 +161,7 @@ class PurchaseTicketsTest extends TestCase
 
         $response->assertStatus(422);
         $this->assertFalse($concert->hasOrderFor('jane@example.com'));
-        $this->assertEquals(2,$concert->ticketsRemaining());
+        $this->assertEquals(2, $concert->ticketsRemaining());
     }
 
     /**

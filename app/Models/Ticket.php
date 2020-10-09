@@ -29,7 +29,7 @@ class Ticket extends Model
 
     public function release()
     {
-        $this->order()->dissociate()->save();
+        $this->update(['reserved_at' => null]);
     }
 
     public function reserve()

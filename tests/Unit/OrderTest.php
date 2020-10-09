@@ -30,22 +30,6 @@ class OrderTest extends TestCase
     /**
      * @test
      */
-    public function tickets_are_released_when_order_is_cancelled()
-    {
-        $concert = Concert::factory()->published()->create(['ticket_price' => 3250])->addTickets(10);
-        $order = $concert->orderTickets('jane@example.com', 5);
-
-        $this->assertEquals(5, $concert->ticketsRemaining());
-
-        $order->cancel();
-        $concert->refresh();
-        $this->assertEquals(10, $concert->ticketsRemaining());
-        $this->assertNull(Order::find($order->id));
-    }
-
-    /**
-     * @test
-     */
     public function converting_to_an_array()
     {
         $concert = Concert::factory()->published()->create(['ticket_price' => 3250])->addTickets(3);

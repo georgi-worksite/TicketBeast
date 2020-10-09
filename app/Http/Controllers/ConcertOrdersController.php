@@ -26,7 +26,6 @@ class ConcertOrdersController extends Controller
      */
     public function store($concertId, Request $request)
     {
-        $order = null;
         $concert = Concert::published()->findOrFail($concertId);
 
         $validatedData = $request->validate([
@@ -52,6 +51,7 @@ class ConcertOrdersController extends Controller
 
             return response()->json($order, 201);
         } catch (PaymentFailedException $e) {
+            $reservation->cancel();
             return response()->json([$e], 422);
         } catch (NotEnoughTicketsException $e) {
             return response()->json([$e], 422);

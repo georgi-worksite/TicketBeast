@@ -32,17 +32,14 @@ class ReservationTest extends TestCase
         $this->withoutExceptionHandling();
         $tickets = collect([]);
         foreach (range(0, 2) as $index) {
-            $ticket = Mockery::mock(Ticket::class);
-            $ticket->shouldReceive('release')->once();
-            $tickets->push($ticket);
-            /* $tickets->push(Mockery::spy(Ticket::class)); */
+            $tickets->push(Mockery::spy(Ticket::class));
         }
         $reservation = new Reservation($tickets);
 
         $reservation->cancel();
 
-        /* foreach ($tickets as $ticket) {
+        foreach ($tickets as $ticket) {
             $ticket->shouldHaveReceived('release')->once();
-        } */
+        }
     }
 }
